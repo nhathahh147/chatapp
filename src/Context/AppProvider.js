@@ -1,28 +1,55 @@
-import React from 'react';
-import { AuthContext } from './AuthProvider';
-import useFirestore from '../hooks/useFirestore';
+import React, { useState } from "react";
+import { AuthContext } from "./AuthProvider";
+import useFirestore from "../hooks/useFirestore";
 
 export const AppContext = React.createContext();
 
 export default function AppProvider({ children }) {
-    
-    const { 
-        user: { uid }
-    } = React.useContext(AuthContext);
+  const [isAddRoomVisible, setIsAddRoomVisible] = useState(false);
+  const [selectedRoomId, setSelectedRoomId] = useState("");
 
-    const roomsCondition = React.useMemo(() => {
-        return {
-            fieldName: 'members',
-            operator: 'array-contains',
-            comparaValue: uid
-        }
-    }, [uid])
+  const {
+    user: { uid },
+  } = React.useContext(AuthContext);
 
-    const rooms = useFirestore('rooms', roomsCondition);
+  const roomsCondition = React.useMemo(() => {
+    return {
+      fieldName: "members",
+      operator: "array-contains",
+      comparaValue: uid,
+    };
+  }, [uid]);
 
+  const rooms = useFirestore("rooms", roomsCondition);
+
+  const selectedRoom = React.useMemo(
+    () => rooms.find((room) => room.id === selectedRoomId) || {},
+    [rooms, selectedRoomId]
+  ); 
+
+  const usersCondition = React.useMemo(() => {
+    return {
+      fieldName: "uid",
+      operator: "in",
+      comparaValue: selectedRoom.members,
+    };
+  }, [selectedRoom.members]);
+
+  const members = useFirestore("users", usersCondition);
+  console.log({members, selectedMembers: selectedRoom.members});
   return (
-    <AppContext.Provider value={{rooms}}>
-        {children}
+    <AppContext.Provider
+      value={{
+        rooms,
+        members,
+        selectedRoom,
+        isAddRoomVisible,
+        setIsAddRoomVisible,
+        selectedRoomId,
+        setSelectedRoomId,
+      }}
+    >
+      {children}
     </AppContext.Provider>
   );
 }
