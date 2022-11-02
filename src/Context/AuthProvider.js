@@ -12,7 +12,6 @@ export default function AuthProvider({ children }) {
 
     React.useEffect(() => {
         const unsubscibed = auth.onAuthStateChanged((user) => {
-            console.log({ user });
             if (user) { 
                 const { displayName, email, uid, photoURL } = user;
                 setUser({
@@ -23,6 +22,7 @@ export default function AuthProvider({ children }) {
                 return;
             }
 
+            setIsLoading(false);
             history.push('/login');
         });
 
