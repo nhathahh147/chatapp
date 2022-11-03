@@ -33,7 +33,6 @@ const LinkStyle = styled(Typography.Link)`
 export default function RoomList() {
   const { rooms, setIsAddRoomVisible, setSelectedRoomId } =
     React.useContext(AppContext);
-  console.log({ rooms });
 
   const handleAddRoom = () => {
     setIsAddRoomVisible(true);

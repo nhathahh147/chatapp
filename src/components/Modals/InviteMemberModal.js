@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { Avatar, Form, Modal, Select, Spin } from 'antd';
 import { AppContext } from '../../Context/AppProvider';
 import { debounce } from 'lodash';
+import { db } from '../../firebase/config';
 
 function DebounceSelect({ fetchOptions, debounceTimeout = 300, ...props }) {
     const [fetching, setFetching] = useState(false);
@@ -12,7 +13,7 @@ function DebounceSelect({ fetchOptions, debounceTimeout = 300, ...props }) {
             setOptions([]);
             setFetching(true);
 
-            fetchOptions(value).then(newOptions => {
+            fetchOptions(value, props.curMember).then(newOptions => {
                 setOptions(newOptions);
                 setFetching(false);
             })
@@ -24,13 +25,14 @@ function DebounceSelect({ fetchOptions, debounceTimeout = 300, ...props }) {
     return (
         <Select
             labelInValue
+            filterOption={false}
             onSearch={debounceFetcher}
             notFoundContent={ fetching ? <Spin size='small'/> : null}
             {...props}
         >
             {
                 options.map(opt => (
-                    <Select.Option>
+                    <Select.Option key={opt.value} value={opt.value} title={opt.label}>
                         <Avatar size='small' src={opt.photoURL}>
                             {opt.photoURL ? '' : opt.label?.charAt(0)?.toUpperCase()}
                         </Avatar>
@@ -42,17 +44,31 @@ function DebounceSelect({ fetchOptions, debounceTimeout = 300, ...props }) {
     )
 }
 
-async function fetchUserList() {}
+async function fetchUserList(search, curMember) {
+    return db.collection('users').where('keywords', 'array-contains', search).orderBy('displayName').limit(20).get().then(snapshot => {
+        return snapshot.docs.map(doc => ({
+            label: doc.data().displayName,
+            value: doc.data().uid,
+            photoURL: doc.data().photoURL
+        })).filter(opt => !curMember.includes(opt.value));
+    });
+}
 
 export default function InviteMemberModal() {
-    const { isInviteMemberVisible, setIsInviteMemberVisible } = useContext(AppContext);
+    const { isInviteMemberVisible, setIsInviteMemberVisible, selectedRoomId, selectedRoom } = useContext(AppContext);
     const [value, setValue] = useState([])
     const [form] = Form.useForm();
 
     const handleOk = () => {
-        
-
+        // reset form value
         form.resetFields();
+
+        //update members in current room
+        const roomRef = db.collection('rooms').doc(selectedRoomId);
+
+        roomRef.update({
+            members: [...selectedRoom.members, ...value.map((val) => val.value)],
+        })
 
         setIsInviteMemberVisible(false);
     };
@@ -80,6 +96,7 @@ export default function InviteMemberModal() {
                     fetchOptions={fetchUserList}
                     onChange={newValue => setValue(newValue)}
                     style={{ width: '100%' }}
+                    curMember={selectedRoom.members}
                 />
             </Form>
         </Modal>

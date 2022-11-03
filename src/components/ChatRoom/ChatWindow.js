@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import styled from "styled-components";
 import { UserAddOutlined } from "@ant-design/icons";
-import { Avatar, Tooltip, Button, Form, Input } from "antd";
+import { Avatar, Tooltip, Button, Form, Input, Alert } from "antd";
 import Message from "./Message";
 import { AppContext } from "../../Context/AppProvider";
 
@@ -72,64 +72,68 @@ export default function ChatWindow() {
 
   return (
     <WrapperStyled>
-      <HeaderStyle>
-        <div className="header__info">
-          <p className="header__title">{selectedRoom.name}</p>
-          <span className="header__description">
-            {selectedRoom.description}
-          </span>
-        </div>
-        <ButtonGroupStyled>
-          <Button icon={<UserAddOutlined />} type="text" onClick={() => setIsInviteMemberVisible(true)}>
-            Mời
-          </Button>
-          <Avatar.Group size="small" maxCount={2}>
-            {
-                members.map(member => <Tooltip title={member.displayName} key={member.id}>
-                <Avatar src={member.photoURL}>{member.photoURL ? '' : member.displayName?.charAt(0)?.toUpperCase()}</Avatar>
-              </Tooltip>)
-            }
-          </Avatar.Group>
-        </ButtonGroupStyled>
-      </HeaderStyle>
-      <ContentStyle>
-        <MessageListStyle>
-          <Message
-            text="Hello"
-            photoURL={null}
-            displayName="ABC"
-            createdAt={12322002}
-          />
-          <Message
-            text="Hi"
-            photoURL={null}
-            displayName="ABC"
-            createdAt={12322002}
-          />
-          <Message
-            text="Alo"
-            photoURL={null}
-            displayName="ABC"
-            createdAt={12322002}
-          />
-          <Message
-            text="2"
-            photoURL={null}
-            displayName="ABC"
-            createdAt={12322002}
-          />
-        </MessageListStyle>
-        <FormStyle>
-          <Form.Item>
-            <Input
-              placeholder="Nhập tin nhắn"
-              bordered={false}
-              autoComplete="off"
+      {
+        selectedRoom.id ? (
+          <><HeaderStyle>
+          <div className="header__info">
+            <p className="header__title">{selectedRoom.name}</p>
+            <span className="header__description">
+              {selectedRoom.description}
+            </span>
+          </div>
+          <ButtonGroupStyled>
+            <Button icon={<UserAddOutlined />} type="text" onClick={() => setIsInviteMemberVisible(true)}>
+              Mời
+            </Button>
+            <Avatar.Group size="small" maxCount={2}>
+              {
+                  members.map(member => <Tooltip title={member.displayName} key={member.id}>
+                  <Avatar src={member.photoURL}>{member.photoURL ? '' : member.displayName?.charAt(0)?.toUpperCase()}</Avatar>
+                </Tooltip>)
+              }
+            </Avatar.Group>
+          </ButtonGroupStyled>
+        </HeaderStyle>
+        <ContentStyle>
+          <MessageListStyle>
+            <Message
+              text="Hello"
+              photoURL={null}
+              displayName="ABC"
+              createdAt={12322002}
             />
-          </Form.Item>
-          <Button type="primary">Gửi</Button>
-        </FormStyle>
-      </ContentStyle>
+            <Message
+              text="Hi"
+              photoURL={null}
+              displayName="ABC"
+              createdAt={12322002}
+            />
+            <Message
+              text="Alo"
+              photoURL={null}
+              displayName="ABC"
+              createdAt={12322002}
+            />
+            <Message
+              text="2"
+              photoURL={null}
+              displayName="ABC"
+              createdAt={12322002}
+            />
+          </MessageListStyle>
+          <FormStyle>
+            <Form.Item>
+              <Input
+                placeholder="Nhập tin nhắn"
+                bordered={false}
+                autoComplete="off"
+              />
+            </Form.Item>
+            <Button type="primary">Gửi</Button>
+          </FormStyle>
+        </ContentStyle></>
+        ) : <Alert message="Hãy chọn phòng" type="info" showIcon style={{margin: 5}} closable/>
+      }
     </WrapperStyled>
   );
 }
