@@ -9,6 +9,24 @@ export const addDocument = (collection, data) => {
     })
 }
 
+export const addUpdata = (collection, data) => {
+  const query = db.collection(collection);
+
+  query.update({
+      ...data,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+  })
+}
+
+export const addDelete = (collection, data) => {
+  const query = db.collection(collection);
+
+  query.delete({
+      ...data,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+  })
+}
+
 // tao keywords cho displayName, su dung cho search
 export const generateKeywords = (displayName) => {
     // liet ke tat cac hoan vi. vd: name = ["David", "Van", "Teo"]

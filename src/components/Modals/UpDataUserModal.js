@@ -1,33 +1,31 @@
 import React, { useContext } from 'react';
 import { Form, Modal, Input } from 'antd';
 import { AppContext } from '../../Context/AppProvider';
-import { addDocument } from '../../firebase/services';
-import { AuthContext } from '../../Context/AuthProvider';
+import { addUpdata } from '../../firebase/services';
 
 export default function AddRoomModal() {
-    const { isAddRoomVisible, setIsAddRoomVisible } = useContext(AppContext);
-    const { user: { uid } } = useContext(AuthContext);
+    const { isUpdataUserVisible, setIsUpDataUserVisible } = useContext(AppContext);
     const [form] = Form.useForm();
 
     const handleOk = () => {
-        addDocument('rooms', {...form.getFieldValue(), members: [uid]})
+        addUpdata('users', {...form.getFieldValue()})
 
         form.resetFields();
 
-        setIsAddRoomVisible(false);
+        setIsUpDataUserVisible(false);
     };
 
     const handleCancel = () => {
         form.resetFields();
 
-        setIsAddRoomVisible(false);
+        setIsUpDataUserVisible(false);
     };
 
   return (
     <div>
         <Modal
-            title="Tạo phòng"
-            visible={isAddRoomVisible}
+            title="sửa thông tin"
+            visible={isUpdataUserVisible}
             onOk={handleOk}
             onCancel={handleCancel}
         >
